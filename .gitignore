@@ -1,0 +1,7 @@
+*.sty
+*.log
+*.aux
+*.pdf
+*.glo
+*.idx
+*.out

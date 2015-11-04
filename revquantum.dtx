@@ -1,0 +1,537 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2015 by Christopher Granade <cgranade@cgranade.com>
+% ---------------------------------------------------------------------------
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Christopher Granade (cgranade@cgranade.com).
+%
+% This work consists of the files revquantum.dtx and revquantum.ins
+% and the derived filebase revquantum.sty.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{revquantum.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<package>\ProvidesPackage{revquantum}
+%<*package>
+    [2015/11/04 v0.02 Hacks to make writing quantum papers for revtex4-1 less painful.]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[pretty]{revquantum}[2015/11/04]
+\usepackage{amsmath}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{revquantum.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v0.02}{2015/11/04}{Initial public version.}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+%
+% \providecommand*{\url}{\texttt}
+% \GetFileInfo{revquantum.dtx}
+% \title{The \textsf{revquantum} package}
+% \author{Christopher Granade \\ \url{cgranade@cgranade.com}}
+% \date{\fileversion~from \filedate}
+%
+% \maketitle
+%
+% \section{Introduction}
+%
+% The \textsf{revquantum} package provides a number of useful hacks to solve
+% common annoyances with the \textsf{revtex4-1} package, and to define notation
+% in common use within quantum information.
+%
+% \section{Usage}
+%
+% \textbf{NB:} \textsf{revquantum} must be loaded first unless |nobibtexhacks|
+% is passed.
+%
+%
+% \DescribeMacro{\booloption}
+% \DescribeMacro{\newnew}
+%
+% These commands are used internally by \textsf{revquantum} to define
+% new boolean package options, and to declare new kinds of |\newcommand|
+% commands. For example, |\newnew| is used to define |\newoperator|,
+% which in turn defines new commands for named mathematical operators (e.g. $\Tr$).
+%
+%
+% \DescribeMacro{\sectionautorefname}
+% \DescribeMacro{\algorithmautorefname}
+% \DescribeMacro{\equationautorefname}
+% \DescribeMacro{\lemmaautorefname}
+%
+% These commands configure \textsf{hyperref}'s \texttt{autoref} command
+% for use with \textsf{revtex4-1}, so that \texttt{autoref} correctly
+% describes Section, Algorithm, and Lemma, and also follows the standard
+% notation for equation references.
+%
+% \DescribeMacro{\TODO}
+%
+%
+% \DescribeMacro{\todolist}
+%
+%
+%
+%
+% \DescribeMacro{\ii}
+%
+%
+% \DescribeMacro{\dd}
+%
+%
+% \DescribeMacro{\defeq}
+%
+%
+% \DescribeMacro{\expect}
+%
+%
+% \DescribeMacro{\id}
+%
+%
+% \DescribeMacro{\newaffil}
+%
+
+%
+% \StopEventually{}
+%
+% \section{Implementation}
+%
+% \iffalse
+%<*package>
+% \fi
+%
+
+% \subsection{Options Handling} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% We will need to define a few options to make the package nicer to use. We do
+% so by making a new command, |\booloption| \marg{boolname} \marg{optionname}
+% \marg{default}.
+
+%    \begin{macrocode}
+
+\usepackage{ifthen}
+
+%    \end{macrocode}
+%
+% \begin{macro}{\booloption}
+%    \begin{macrocode}
+\newcommand{\booloption}[3]{
+    \newboolean{#1}
+    \setboolean{#1}{#3}
+    \ifthenelse{\equal{#3}{true}}{
+%    \end{macrocode}
+% Default is true, so we need a "no" option to
+% turn off the new boolean.
+%    \begin{macrocode}
+        \DeclareOption{no#2}{\setboolean{#1}{false}}
+    }{
+%    \end{macrocode}
+% Default is false, so we need an option to turn
+% on the new boolean.
+%    \begin{macrocode}
+        \DeclareOption{#2}{\setboolean{#1}{true}}
+    }
+}
+%    \end{macrocode}
+% \end{macro}
+
+% We then use this new command to define the options for \textsf{revquantum},
+% |final|, |pretty|, |uselistings| and |nobibtexhacks|.
+
+%    \begin{macrocode}
+
+\booloption{@final}{final}{false}
+\booloption{@pretty}{pretty}{false}
+\booloption{@uselistings}{uselistings}{false}
+\booloption{@bibtexhacks}{bibtexhacks}{true}
+
+\ProcessOptions\relax
+
+%    \end{macrocode}
+
+% \subsection{Unforgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% These hacks include the title of each reference in the BibTeX output by
+% redefining the part of \textsf{revtex4-1} on the fly which is responsible
+% for writing out the bibdata.
+
+%    \begin{macrocode}
+
+\ifthenelse{\boolean{@bibtexhacks}}{\def\@bibdataout@aps{%
+ \immediate\write\@bibdataout{%
+  @CONTROL{%
+   apsrev41Control,author="08",editor="1",pages="0",title="0",year="1",eprint="1"%
+  }%
+ }%
+ \if@filesw
+  \immediate\write\@auxout{\string\citation{apsrev41Control}}%
+ \fi
+}}{}
+
+%    \end{macrocode}
+
+% \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Here, we import a few other useful packages and configure them according to
+% the options passed by the user.
+
+%    \begin{macrocode}
+
+\RequirePackage[breaklinks=true]{hyperref}
+\RequirePackage[usenames,dvipsnames]{color}
+\RequirePackage{braket}
+\RequirePackage{graphicx}
+\RequirePackage[english]{babel}
+\ifthenelse{\boolean{@pretty}}{
+    \RequirePackage{mathpazo}
+}{}
+\ifthenelse{\boolean{@uselistings}}{
+    \RequirePackage{listings}
+    \RequirePackage{textcomp} % Make sure we have a ` for writing
+%    \end{macrocode}
+% Mathematica.
+%    \begin{macrocode}
+}{}
+%    \end{macrocode}
+
+% \subsubsection{\textsf{hyperref} Setup}
+
+% Get rid of \textsf{hyperref}'s ugly boxes.
+%From:http://tex.stackexchange.com/a/51349
+%    \begin{macrocode}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor    = red %Colour of citations
+}
+
+%    \end{macrocode}
+
+% \subsubsection{\textsf{autoref} Setup}
+
+% \begin{macro}{\sectionautorefname}
+%    \begin{macrocode}
+\def\sectionautorefname{Section}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\algorithmautorefname}
+%    \begin{macrocode}
+\def\algorithmautorefname{Algorithm}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\equationautorefname}
+% See http://tex.stackexchange.com/a/66150.
+%    \begin{macrocode}
+\def\equationautorefname~#1\null{(#1)\null}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\lemmaautorefname}
+%    \begin{macrocode}
+\newcommand{\lemmaautorefname}{Lemma}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+
+%    \end{macrocode}
+
+% \subsubsection{Theorem Environments}
+
+%    \begin{macrocode}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+%    \end{macrocode}
+
+% \subsubsection{\textsf{algorithm} and \textsf{algpseudocode} Setup}
+
+%    \begin{macrocode}
+
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \newcommand{\inlinecomment}[1]{\Comment {\footnotesize #1} \normalsize}
+    \newcommand{\linecomment}[1]{\State \(\triangleright\) {\footnotesize #1} \normalsize}
+
+%    \end{macrocode}
+
+% \subsubsection{\textsf{listings} Setup}
+
+%    \begin{macrocode}
+
+\ifthenelse{\boolean{@uselistings}}{
+    \definecolor{comment-color}{gray}{0.5}
+
+    \lstset{
+        basicstyle=\footnotesize,
+        commentstyle=\color{comment-color},
+        frame=lines,
+        gobble=4,
+        numbers=left,
+        numberstyle=\tiny, stepnumber=5,
+        numbersep=5pt
+    }
+
+    \lstdefinestyle{matlab}{
+        language=MATLAB,
+        mathescape=true
+    }
+
+    \lstdefinestyle{python}{
+        language=Python,
+        mathescape=true,
+        showstringspaces=false,
+    }
+
+    \lstdefinestyle{mathematica}{
+        language=Mathematica,
+        upquote=true, % Needed to deal with the context symbol `.'
+        literate=
+            {->}{$\to$}1
+            {!=}{$\neq$}1
+            {\\[DoubleStruckOne]}{${\id}$}1
+            {\\[Sigma]}{$\sigma$}1
+            {(x)}{$\otimes$}1 % CG: I have the distinct impression this will break. Badly.
+    }
+}{}
+
+%    \end{macrocode}
+
+% \subsection{TODO Support} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% These commands provide a way of marking items as needing to be done before
+% the final version (denoted by the |final| package option).
+
+% \begin{macro}{\todo}
+%    \begin{macrocode}
+
+\ifthenelse{\boolean{@final}}{
+    \newcommand{\todo}[1]{
+        \PackageError{revquantum}{Unaddressed TODO}
+        \rq@todo{#1}
+    }
+}{
+    \newcommand{\todo}[1]{
+        \PackageWarning{revquantum}{Unaddressed TODO}
+        \rq@todo{#1}
+    }
+}
+
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\rq@todo}
+%    \begin{macrocode}
+\newcommand{\rq@todo}[1]{
+    {\color{Plum} #1}
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\TODO}
+%    \begin{macrocode}
+\newcommand{\TODO}{\todo{TODO}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\todolist}
+%    \begin{macrocode}
+\newcommand{\todolist}[1]{\todo{
+    \begin{itemize}
+        #1
+    \end{itemize}
+}}
+
+%    \end{macrocode}
+% \end{macro}
+
+
+% \subsection{Notation}
+%
+%
+% \begin{macro}{\newnew}
+%    \begin{macrocode}
+\newcommand{\newnew}[2]{
+    \expandafter\newcommand\csname new#1\endcsname[1]{
+      \expandafter\newcommand\csname ##1\endcsname{#2{##1}}
+    }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\newnew{operator}{\operatorname}
+\newnew{rm}{\mathrm}
+
+\newoperator{Tr}
+\newoperator{Cov}
+\newoperator{supp}
+\newoperator{diag}
+\newoperator{rank}
+
+%    \end{macrocode}
+%
+% \begin{macro}{\ii}
+%    \begin{macrocode}
+\newcommand{\ii}{\mathrm{i}} % Outside what newnew currently supports.
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\dd}
+%    \begin{macrocode}
+\newcommand{\dd}{\mathrm{d}} % Outside what newnew currently supports.
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\newrm{e}
+
+\newrm{pa}
+\newrm{TVD}
+\newrm{T}
+
+%    \end{macrocode}
+%
+% \begin{macro}{\defeq}
+%    \begin{macrocode}
+\newcommand{\defeq}{\mathrel{:=}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\expect}
+%    \begin{macrocode}
+\newcommand{\expect}{\mathbb{E}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\id}
+%    \begin{macrocode}
+\newcommand{\id}{\openone}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+
+%    \end{macrocode}
+
+% \subsection{Affiliation Database}
+%
+% \begin{macro}{\newaffil}
+%    \begin{macrocode}
+\newcommand{\newaffil}[2]{
+    \expandafter\newcommand\csname affil#1\endcsname{
+        \affiliation{
+            #2
+        }
+    }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+
+\newaffil{TODO}{\TODO}
+
+\newaffil{EQUS}{
+    Centre for Engineered Quantum Systems,
+    University of Sydney,
+    Sydney, NSW, Australia
+}
+\newaffil{USydPhys}{
+    School of Physics,
+    University of Sydney,
+    Sydney, NSW, Australia
+}
+\newaffil{IQC}{
+    Institute for Quantum Computing,
+    University of Waterloo,
+    Waterloo, ON, Canada
+}
+\newaffil{UWAMath}{
+    Department of Applied Mathematics,
+    University of Waterloo,
+    Waterloo, ON, Canada
+}
+\newaffil{UWChem}{
+    Department of Chemistry,
+    University of Waterloo,
+    Waterloo, ON, Canada
+}
+\newaffil{PI}{
+    Perimeter Institute for Theoretical Physics,
+    31 Caroline St. N,
+    Waterloo, Ontario, Canada N2L 2Y5
+}
+\newaffil{CIFAR}{
+    Canadian Institute for Advanced Research,
+    Toronto, ON, Canada
+}
+\newaffil{IBMTJW}{
+    IBM T. J. Watson Research Center,
+    Yorktown Heights, New York 10598, USA
+}
+
+\endinput%    \end{macrocode}
+
+%
+% \iffalse
+%</package>
+% \fi
+%
+% \Finale
+\endinput
