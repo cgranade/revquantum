@@ -5,3 +5,7 @@
 *.glo
 *.idx
 *.out
+*.bbl
+*.blg
+*.synctex.gz
+*Notes.bib

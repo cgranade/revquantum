@@ -1,0 +1,52 @@
+\documentclass[pra,aps,twocolumn,superscriptaddress,10pt]{revtex4-1}
+\usepackage[pretty,uselistings]{revquantum}
+
+%=============================================================================
+% FRONT MATTER
+%=============================================================================
+
+\begin{document}
+
+\title{Example \textsf{revquantum} Document}
+
+\author{Christopher Granade}
+\email{cgranade@cgranade.com}
+\affilUSydPhys
+\affilEQUS
+
+\date{\today}
+
+\begin{abstract}
+    \TODO
+\end{abstract}
+
+\maketitle
+
+%=============================================================================
+% MAIN DOCUMENT
+%=============================================================================
+
+Lorum ipsum is kind of dated by now, but whatever. At least we can $\Tr$ its
+history.
+
+\todo{an example of a TODO, which will cause errors if present in the
+\texttt{final} version.}
+
+\bibliography{example}
+
+%=============================================================================
+% APPENDICES
+%=============================================================================
+
+\appendix
+
+%=============================================================================
+\section{Source Code}
+\label{apx:code}
+%=============================================================================
+
+\begin{lstlisting}[style=python,gobble=4,caption={Quick example of importing \cite{johansson_qutip_2013}.}]
+   >>> import qutip as qt
+\end{lstlisting}
+
+\end{document} 

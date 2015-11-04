@@ -10,6 +10,34 @@ writing quantum information papers in ``{revtex4-1}``. In particular:
 - Provides notation for quantum information and makes defining new notation easier.
 - Reduces boilerplate for author affiliations by providing a (rudimentary) database for a few departments.
 
+A major goal of this package is to reduce the amount of useless crap that needs to be copied and pasted between documents. In particular, a complete document can be written in just a few lines:
+
+```latex
+\documentclass[pra,aps,twocolumn,superscriptaddress,10pt]{revtex4-1}
+\usepackage[pretty,uselistings]{revquantum}
+
+\begin{document}
+
+\title{Example \textsf{revquantum} Document}
+
+\author{Christopher Granade}
+\email{cgranade@cgranade.com}
+\affilUSydPhys \affilEQUS
+
+\date{\today}
+
+\begin{abstract}
+    \TODO
+\end{abstract}
+
+\maketitle
+
+\bibliography{example}
+\appendix
+
+\end{document} 
+```
+
 ## Installing ##
 
 Installing LaTeX packages outside of CTAN is a pain, and this is no exception. I'll submit there at some point to remove that difficulty. In the meantime, I think the following works on Unix-like systems. If not, let me know or pull request with better instructions.
@@ -23,3 +51,20 @@ $ texhash
 ```
 
 Directions for Windows/MikTeX can be found thanks to [this useful StackOverflow answer](http://tex.stackexchange.com/questions/2063/how-can-i-manually-install-a-package-on-miktex-windows).
+
+## Using ##
+
+I'll write more complete documentation later (hopefully), but for now:
+
+- ``{braket}`` is automatically imported, defining ``\ket``, ``\bra`` and ``\braket``.
+- The notation commands ``\ii`` and ``\dd`` typeset roman "i" and "d" characters, respectively. More generally, ``\newrm{foo}`` creates a new command ``\foo`` that typesets ``foo`` in math-roman. ``{revquantum}`` comes with ``\e``, ``\TVD`` and ``\T`` predefined using ``\newrm``.
+- Similarly, ``\newoperator`` defines new commands which typeset using ``\operatorname``. By default, this is used to define ``\Tr``, ``\Cov``, ``\supp``, ``\diag`` and ``\rank``.
+- The commands ``\defeq``, ``\expect`` and ``\id`` define the common notation ``:=``, double-struck E and double-struck 1 (respectively).
+- ``\newaffil{NAME}{DESCRIPTION}`` defines a new affiliation command ``\affilNAME``.
+- The ``\todo`` command typesets its argument in purple and raises a warning when built. If ``{revquantum}`` is loaded with the ``[final]`` option, this warning is escalated to an error. Similarly, ``\TODO`` takes no argument but inserts the placeholder "TODO" and ``\todolist`` typesets an ``{itemize}`` environment in ``\todo``.
+
+## Known Issues ##
+
+- The BibTeX thing is an unforgivable hack. Thankfully, I'm not asking for anyone's forgiveness.
+- ``\autoref`` chokes on appendices, giving nonsense like "Section A". This should be fixable, though.
+- The use of the "UW" prefix for the University of Waterloo was probably a bad idea, and will likely change so as to not preclude other universities whose names start with "W".
