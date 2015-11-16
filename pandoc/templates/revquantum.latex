@@ -1,5 +1,10 @@
 \documentclass[pra,aps,onecolumn,superscriptaddress,10pt,notitlepage$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{revtex4-1}
-\usepackage[pretty$if(listings)$,uselistings$endif$]{revquantum}
+\usepackage[$if(pretty)$pretty$endif$,$if(listings)$,uselistings$endif$]{revquantum}
+
+% Fake natbib support to get BibTeX working through {revtex4-1}
+% instead.
+\renewcommand{\citet}{\cite}
+
 \usepackage{ifxetex,ifluatex}
 \usepackage{fixltx2e} % provides \textsubscript
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
