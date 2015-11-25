@@ -62,6 +62,7 @@
 %   Right brace   \}     Tilde         \~}
 %
 %
+% \changes{v0.03}{2015/11/26}{Integration of stmaryrd, better docs.}
 % \changes{v0.02}{2015/11/04}{Initial public version.}
 %
 % \DoNotIndex{\newcommand,\newenvironment}
@@ -78,13 +79,128 @@
 %
 % The \textsf{revquantum} package provides a number of useful hacks to solve
 % common annoyances with the \textsf{revtex4-1} package, and to define notation
-% in common use within quantum information.
+% in common use within quantum information. In doing so, \textsf{revquantum}
+% imports and configures a number of commonly-available and used packages, and
+% where reasonable, provides fallbacks.
 %
 % \section{Usage}
 %
 % \textbf{NB:} \textsf{revquantum} must be loaded first unless |nobibtexhacks|
 % is passed.
 %
+% \subsection{Package Options}
+%
+% The \textsf{revquantum} package provides several options to configure its behavior.
+% These can be used in the traditional way, as optional arguments to |\usepackage|.
+% For instance, this document was prepared using |\usepackage[pretty]{revquantum}|.
+%
+% \DescribeMacro{[final]}
+%
+% Removes support for TODO commands (see below), causing them to escalate from
+% warnings to errors.
+%
+% \DescribeMacro{[pretty]}
+%
+% Uses the \textsf{mathpazo} package to typeset the document
+% more nicely than the default for \textsf{revtex4-1} drafts.
+%
+% \DescribeMacro{[uselistings]}
+%
+% Includes the \textsf{listings} package and configures it for
+% literate and math-escape notation in Python, Mathematica and MATLAB.
+%
+% \DescribeMacro{[nobibtexhacks]}
+%
+% Prevents \textsf{revquantum} from patching the \BibTeX support provided
+% by \textsf{revtex4-1} to include titles.
+%
+% \subsection{New Commands}
+%
+% \subsubsection{TODO Annotations}
+%
+% \DescribeMacro{\todo} \marg{annotation}
+%
+% Marks an incompleted task in a different color in the document, and raises
+% a warning in the LaTeX log.
+%
+% \DescribeMacro{\TODO}
+% \TODO
+%
+% \DescribeMacro{\todolist} \marg{contents}
+%
+% Typesets \emph{contents} as a TODO annotation, wrapped in an |{enumerate}|
+% environment.
+%
+% \subsubsection{Mathematical Notation}
+%
+% This package also provides commands for notation common in quantum information.
+%
+% \DescribeMacro{\ii}
+% \DescribeMacro{\dd}
+%
+% These commands typeset the imaginary unit $\ii$ and differential element $\dd$,
+% respectively, in math roman.
+%
+% \DescribeMacro{\defeq}
+%
+% This command uses |\mathrel| to properly format the colon-equals operator
+% as a relation operator.
+%
+% \DescribeMacro{\expect}
+% Typesets the expectation operator $\expect$.
+%
+% \DescribeMacro{\id}
+%
+% \todo{The current implementation of id is to call openone, provided by revtex4-1,
+% and thus not available when used from documentation.}
+%
+% \DescribeMacro{\llbracket}
+% \DescribeMacro{\rrbracket}
+%
+% Typesets the double-square brackets commonly used to denote stabilizer code
+% properties, as in $\llbracket n, k, d \rrbracket$. These commands are provided
+% by |{stmaryrd}|, and are given a reasonable fallback if that package is not
+% available.
+%
+%
+%
+% \subsubsection{Affiliation Database}
+%
+% The \textsf{revquantum} package provides commands for quickly typesetting
+% affiliations, with an eye towards reducing copy-paste errors when authors have
+% a nontrivial set of shared affiliations.
+%
+% \DescribeMacro{\newaffil} \marg{shorthand} \marg{description}
+%
+% The workhorse of the affiliation database is the |\newaffil| command,
+% which defines a new command that expands to call the \textsf{revtex4-1}
+% |\affiliation| command. For instance, |\newaffil{UFooBar}{Bar, UFoo}|
+% defines a new command |\affilUFooBar| that expands to
+% |\affiliation{Bar, UFoo}|.
+%
+% So far, the following affiliation commands are provided:
+%
+% \DescribeMacro{\affilTODO} Special, marks that an affiliation is not
+% provided.
+%
+% \DescribeMacro{\affilEQUS} Centre for Engineered Quantum Systems.
+%
+% \DescribeMacro{\affilUSydPhys} School of Physics, University of Sydney.
+%
+% \DescribeMacro{\affilIQC} Institute for Quantum Computing.
+%
+% \DescribeMacro{\affilUWAMath} Dept. of Applied Mathematics, University of Waterloo.
+%
+% \DescribeMacro{\affilUWChem} Dept. of Chemistry, University of Waterloo.
+%
+% \DescribeMacro{\affilPI} Perimeter Institute for Theoretical Physics.
+%
+% \DescribeMacro{\affilCIFAR} Canadian Institute for Advanced Research.
+%
+% \DescribeMacro{\affilIBMTJW} IBM T. J. Watson Research Center.
+%
+%
+% \subsubsection{Internal-Use Commands}
 %
 % \DescribeMacro{\booloption}
 % \DescribeMacro{\newnew}
@@ -93,7 +209,6 @@
 % new boolean package options, and to declare new kinds of |\newcommand|
 % commands. For example, |\newnew| is used to define |\newoperator|,
 % which in turn defines new commands for named mathematical operators (e.g. $\Tr$).
-%
 %
 % \DescribeMacro{\sectionautorefname}
 % \DescribeMacro{\algorithmautorefname}
@@ -104,33 +219,6 @@
 % for use with \textsf{revtex4-1}, so that \texttt{autoref} correctly
 % describes Section, Algorithm, and Lemma, and also follows the standard
 % notation for equation references.
-%
-% \DescribeMacro{\TODO}
-%
-%
-% \DescribeMacro{\todolist}
-%
-%
-%
-%
-% \DescribeMacro{\ii}
-%
-%
-% \DescribeMacro{\dd}
-%
-%
-% \DescribeMacro{\defeq}
-%
-%
-% \DescribeMacro{\expect}
-%
-%
-% \DescribeMacro{\id}
-%
-%
-% \DescribeMacro{\newaffil}
-%
-
 %
 % \StopEventually{}
 %
@@ -402,7 +490,7 @@
 % \end{macro}
 
 
-% \subsection{Notation}
+% \subsection{Notation} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
 % \begin{macro}{\newnew}
@@ -472,7 +560,23 @@
 
 %    \end{macrocode}
 
-% \subsection{Affiliation Database}
+% We want to only conditionally use |{stmaryrd}| if it's available, and
+% otherwise, hack up a few commands from that package.
+%
+%    \begin{macrocode}
+    \IfFileExists{stmaryrd.sty}{
+        \RequirePackage{stmaryrd}
+    }{
+        \PackageWarning{revquantum}{
+            The stmaryrd package is not available,
+            so some commands (e.g.: double-brackets) will look wrong.
+        }
+        \newcommand{\llbracket}{[\!\!\hspace{1.5pt}[}
+        \newcommand{\rrbracket}{]\!\!\hspace{1.5pt}]}
+    }
+%    \end{macrocode}
+
+% \subsection{Affiliation Database} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % \begin{macro}{\newaffil}
 %    \begin{macrocode}
