@@ -260,7 +260,8 @@
 %
 % These colors are defined as \textsf{xcolor} color names, such that they
 % can be used in all packages which depend on \textsf{xcolor}. In particular,
-% CUD colors can be directly used from \textsf{tikz}.
+% CUD colors can be directly used from \textsf{tikz}. To use with \textsf{tikz},
+% however, \textsf{revquantum} must be loaded \emph{after} \textsf{tikz}.
 %
 % \StopEventually{}
 %
@@ -362,7 +363,8 @@
 % \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Here, we import a few other useful packages and configure them according to
-% the options passed by the user.
+% the options passed by the user. Note that we only load \textsf{color} if
+% \textsf{tikz} has not already been imported.
 
 %    \begin{macrocode}
 
@@ -372,7 +374,14 @@
 \RequirePackage{amsthm}
 \RequirePackage{amssymb}
 \RequirePackage{amsbsy}
-\RequirePackage[usenames,dvipsnames]{color}
+\@ifpackageloaded{tikz}{}{%
+    \RequirePackage[usenames,dvipsnames]{color}%
+    \AtBeginDocument{%
+        \@ifpackageloaded{tikz}{%
+            \rq@quasiwarn{tikz loaded, but after revquantum. This may not work.}%
+        }%
+    }%
+}
 \RequirePackage{braket}
 \RequirePackage{graphicx}
 \RequirePackage[english]{babel}
@@ -552,8 +561,8 @@
 %
 % \begin{macro}{\rq@todo}
 %    \begin{macrocode}
-\newcommand{\rq@todo}[1]{
-    {\color{Plum} #1}
+\newcommand{\rq@todo}[1]{%
+    {\color{magenta} #1}%
 }
 %    \end{macrocode}
 % \end{macro}
