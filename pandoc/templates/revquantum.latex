@@ -115,13 +115,13 @@ $if(author)$
 $endif$
 \date{$date$}
 
-$if(title)$
-\maketitle
-$endif$
 $if(abstract)$
 \begin{abstract}
 $abstract$
 \end{abstract}
+$endif$
+$if(title)$
+\maketitle
 $endif$
 
 $for(include-before)$
