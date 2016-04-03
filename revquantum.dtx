@@ -360,6 +360,31 @@
 
 %    \end{macrocode}
 
+% Next, we include \href{http://tex.stackexchange.com/a/199299/615}{a solution
+% suggested by egreg} for a rather annoying |{revtex4-1}| bug. In particular,
+% we will set up |language={en}| as an alias for |language={english}|, so that
+% |{revtex4-1}| will no longer raise |{babel}| errors for the undefined language.
+
+%     \begin{macrocode}
+
+\usepackage{letltxmacro}
+
+\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+\DeclareRobustCommand{\selectlanguage}[1]{%
+  \@ifundefined{alias@\string#1}
+    {\ORIGselectlanguage{#1}}
+    {\begingroup\edef\x{\endgroup
+       \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+}
+
+\newcommand{\definelanguagealias}[2]{%
+  \@namedef{alias@#1}{#2}%
+}
+
+\definelanguagealias{en}{english}
+
+%     \end{macrocode}
+
 % \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Here, we import a few other useful packages and configure them according to
