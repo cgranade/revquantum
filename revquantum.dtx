@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2016/04/04 v0.05 Hacks to make writing quantum papers for revtex4-1 less painful.]
+    [2016/04/04 v0.06 Hacks to make writing quantum papers for revtex4-1 less painful.]
 %</package>
 %
 %<*driver>
@@ -61,8 +61,9 @@
 %   Right bracket \]     Circumflex    \^     Underscore    \_
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
+6
 %
-%
+% \changes{v0.06}{2016/04/04}{Fix for hyperref bug.}
 % \changes{v0.05}{2016/04/04}{BibTeX hack for missing babel languages.}
 % \changes{v0.04}{2015/12/30}{Added Color Universal Design color names, checks for incompatible packages.}
 % \changes{v0.03}{2015/11/26}{Integration of stmaryrd, better docs.}
@@ -367,11 +368,12 @@
 
 % Here, we import a few other useful packages and configure them according to
 % the options passed by the user. Note that we only load \textsf{color} if
-% \textsf{tikz} has not already been imported.
+% \textsf{tikz} has not already been imported. Also of import is that we do
+% not import \textsf{hyperref} yet, as it must go last to avoid duplicating
+% reference names.
 
 %    \begin{macrocode}
 
-\RequirePackage[breaklinks=true]{hyperref}
 \RequirePackage{amsmath}
 \RequirePackage{amsfonts}
 \RequirePackage{amsthm}
@@ -398,20 +400,6 @@
 \ifthenelse{\boolean{@bibtexhacks}}{
     \RequirePackage{letltxmacro}
 }{}
-%    \end{macrocode}
-
-% \subsubsection{\textsf{hyperref} Setup}
-
-% Get rid of \textsf{hyperref}'s ugly boxes.
-%From:http://tex.stackexchange.com/a/51349
-%    \begin{macrocode}
-\hypersetup{
-  colorlinks   = true, %Colours links instead of ugly boxes
-  urlcolor     = blue, %Colour for external hyperlinks
-  linkcolor    = blue, %Colour of internal links
-  citecolor    = red %Colour of citations
-}
-
 %    \end{macrocode}
 
 % \subsubsection{\textsf{autoref} Setup}
@@ -785,7 +773,27 @@
     Yorktown Heights, New York 10598, USA
 }
 
-\endinput%    \end{macrocode}
+%    \end{macrocode}
+
+
+% \subsection{\textsf{hyperref} Setup} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Finally, we load \textsf{hyperref} separately so that it can go last.
+
+% Get rid of \textsf{hyperref}'s ugly boxes.
+%From:http://tex.stackexchange.com/a/51349
+%    \begin{macrocode}
+
+\RequirePackage[breaklinks=true]{hyperref}
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor    = red %Colour of citations
+}
+
+%    \end{macrocode}
 
 %
 % \iffalse
