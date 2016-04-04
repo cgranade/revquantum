@@ -339,52 +339,6 @@
 %    \end{macrocode}
 % \end{macro}
 
-% \subsection{Unforgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% These hacks include the title of each reference in the BibTeX output by
-% redefining the part of \textsf{revtex4-1} on the fly which is responsible
-% for writing out the bibdata.
-
-%    \begin{macrocode}
-
-\ifthenelse{\boolean{@bibtexhacks}}{\def\@bibdataout@aps{%
- \immediate\write\@bibdataout{%
-  @CONTROL{%
-   apsrev41Control,author="08",editor="1",pages="0",title="0",year="1",eprint="1"%
-  }%
- }%
- \if@filesw
-  \immediate\write\@auxout{\string\citation{apsrev41Control}}%
- \fi
-}}{}
-
-%    \end{macrocode}
-
-% Next, we include \href{http://tex.stackexchange.com/a/199299/615}{a solution
-% suggested by egreg} for a rather annoying |{revtex4-1}| bug. In particular,
-% we will set up |language={en}| as an alias for |language={english}|, so that
-% |{revtex4-1}| will no longer raise |{babel}| errors for the undefined language.
-
-%     \begin{macrocode}
-
-\usepackage{letltxmacro}
-
-\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
-\DeclareRobustCommand{\selectlanguage}[1]{%
-  \@ifundefined{alias@\string#1}
-    {\ORIGselectlanguage{#1}}
-    {\begingroup\edef\x{\endgroup
-       \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
-}
-
-\newcommand{\definelanguagealias}[2]{%
-  \@namedef{alias@#1}{#2}%
-}
-
-\definelanguagealias{en}{english}
-
-%     \end{macrocode}
-
 % \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Here, we import a few other useful packages and configure them according to
@@ -415,10 +369,10 @@
 }{}
 \ifthenelse{\boolean{@uselistings}}{
     \RequirePackage{listings}
-    \RequirePackage{textcomp} % Make sure we have a ` for writing
-%    \end{macrocode}
-% Mathematica.
-%    \begin{macrocode}
+    \RequirePackage{textcomp} % Make sure we have a ` for writing Mathematica.
+}{}
+\ifthenelse{\boolean{@bibtexhacks}}{
+    \RequirePackage{letltxmacro}
 }{}
 %    \end{macrocode}
 
@@ -560,6 +514,64 @@
 %    \begin{macrocode}
 \rq@warnpackage{subcaption}
 %    \end{macrocode}
+
+
+% \subsection{Unforgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% These hacks include the title of each reference in the BibTeX output by
+% redefining the part of \textsf{revtex4-1} on the fly which is responsible
+% for writing out the bibdata.
+
+%    \begin{macrocode}
+
+\ifthenelse{\boolean{@bibtexhacks}}{\def\@bibdataout@aps{%
+ \immediate\write\@bibdataout{%
+  @CONTROL{%
+   apsrev41Control,author="08",editor="1",pages="0",title="0",year="1",eprint="1"%
+  }%
+ }%
+ \if@filesw
+  \immediate\write\@auxout{\string\citation{apsrev41Control}}%
+ \fi
+}}{}
+
+%    \end{macrocode}
+
+% Next, we include \href{http://tex.stackexchange.com/a/199299/615}{a solution
+% suggested by egreg} for a rather annoying |{revtex4-1}| bug. In particular,
+% we will set up |language={en}| as an alias for |language={english}|, so that
+% |{revtex4-1}| will no longer raise |{babel}| errors for the undefined language.
+
+% \begin{macro}{\ORIGselectlanguage}
+%    \begin{macrocode}
+
+\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+\DeclareRobustCommand{\selectlanguage}[1]{%
+  \@ifundefined{alias@\string#1}
+    {\ORIGselectlanguage{#1}}
+    {\begingroup\edef\x{\endgroup
+       \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+}
+
+%    \end{macrocode}
+% \end{macro}
+
+% \begin{macro}{\definelanguagealias}
+%    \begin{macrocode}
+
+\newcommand{\definelanguagealias}[2]{%
+  \@namedef{alias@#1}{#2}%
+}
+
+%    \end{macrocode}
+% \end{macro}
+
+%    \begin{macrocode}
+
+\definelanguagealias{en}{english}
+
+%    \end{macrocode}
+
 
 % \subsection{TODO Support} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
