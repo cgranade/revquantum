@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2015/12/29 v0.04 Hacks to make writing quantum papers for revtex4-1 less painful.]
+    [2016/04/04 v0.05 Hacks to make writing quantum papers for revtex4-1 less painful.]
 %</package>
 %
 %<*driver>
@@ -63,6 +63,7 @@
 %   Right brace   \}     Tilde         \~}
 %
 %
+% \changes{v0.05}{2016/04/04}{BibTeX hack for missing babel languages.}
 % \changes{v0.04}{2015/12/30}{Added Color Universal Design color names, checks for incompatible packages.}
 % \changes{v0.03}{2015/11/26}{Integration of stmaryrd, better docs.}
 % \changes{v0.02}{2015/11/04}{Initial public version.}
@@ -339,6 +340,29 @@
 %    \end{macrocode}
 % \end{macro}
 
+% \subsection{Unforgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% These hacks include the title of each reference in the BibTeX output by
+% redefining the part of \textsf{revtex4-1} on the fly which is responsible
+% for writing out the bibdata. Note that these hacks \emph{must} come before
+% importing packages, or else \textsf{revtex4-1} will have already written out
+% its control notes.
+
+%    \begin{macrocode}
+
+\ifthenelse{\boolean{@bibtexhacks}}{\def\@bibdataout@aps{%
+ \immediate\write\@bibdataout{%
+  @CONTROL{%
+   apsrev41Control,author="08",editor="1",pages="0",title="0",year="1",eprint="1"%
+  }%
+ }%
+ \if@filesw
+  \immediate\write\@auxout{\string\citation{apsrev41Control}}%
+ \fi
+}}{}
+
+%    \end{macrocode}
+
 % \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Here, we import a few other useful packages and configure them according to
@@ -516,26 +540,7 @@
 %    \end{macrocode}
 
 
-% \subsection{Unforgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% These hacks include the title of each reference in the BibTeX output by
-% redefining the part of \textsf{revtex4-1} on the fly which is responsible
-% for writing out the bibdata.
-
-%    \begin{macrocode}
-
-\ifthenelse{\boolean{@bibtexhacks}}{\def\@bibdataout@aps{%
- \immediate\write\@bibdataout{%
-  @CONTROL{%
-   apsrev41Control,author="08",editor="1",pages="0",title="0",year="1",eprint="1"%
-  }%
- }%
- \if@filesw
-  \immediate\write\@auxout{\string\citation{apsrev41Control}}%
- \fi
-}}{}
-
-%    \end{macrocode}
+% \subsection{Slightly More Forgivable BibTeX Hacks} %%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Next, we include \href{http://tex.stackexchange.com/a/199299/615}{a solution
 % suggested by egreg} for a rather annoying |{revtex4-1}| bug. In particular,
