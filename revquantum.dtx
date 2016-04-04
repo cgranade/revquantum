@@ -61,7 +61,6 @@
 %   Right bracket \]     Circumflex    \^     Underscore    \_
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
-6
 %
 % \changes{v0.06}{2016/04/04}{Fix for hyperref bug.}
 % \changes{v0.05}{2016/04/04}{BibTeX hack for missing babel languages.}
@@ -400,40 +399,6 @@
 \ifthenelse{\boolean{@bibtexhacks}}{
     \RequirePackage{letltxmacro}
 }{}
-%    \end{macrocode}
-
-% \subsubsection{\textsf{autoref} Setup}
-
-% \begin{macro}{\sectionautorefname}
-%    \begin{macrocode}
-\def\sectionautorefname{Section}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\algorithmautorefname}
-%    \begin{macrocode}
-\def\algorithmautorefname{Algorithm}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\equationautorefname}
-% See http://tex.stackexchange.com/a/66150.
-%    \begin{macrocode}
-\def\equationautorefname~#1\null{(#1)\null}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\lemmaautorefname}
-%    \begin{macrocode}
-\newcommand{\lemmaautorefname}{Lemma}
-%    \end{macrocode}
-% \end{macro}
-%
-%    \begin{macrocode}
-
 %    \end{macrocode}
 
 % \subsubsection{Theorem Environments}
@@ -795,6 +760,39 @@
 
 %    \end{macrocode}
 
+
+% \subsubsection{\textsf{autoref} Setup}
+
+% \begin{macro}{\sectionautorefname}
+%    \begin{macrocode}
+\def\sectionautorefname{Section}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\algorithmautorefname}
+%    \begin{macrocode}
+\def\algorithmautorefname{Algorithm}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\equationautorefname}
+% See http://tex.stackexchange.com/a/66150. We must declare this one at the beginning
+% of the document to keep other packages from clobbering it.
+%    \begin{macrocode}
+\AtBeginDocument{%
+    \def\equationautorefname~#1\null{(#1)\null}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\lemmaautorefname}
+%    \begin{macrocode}
+\newcommand{\lemmaautorefname}{Lemma}
+%    \end{macrocode}
+% \end{macro}
 %
 % \iffalse
 %</package>
