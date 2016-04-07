@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2016/04/04 v0.06 Hacks to make writing quantum papers for revtex4-1 less painful.]
+    [2016/04/04 v0.07 Hacks to make writing quantum papers for revtex4-1 less painful.]
 %</package>
 %
 %<*driver>
@@ -62,6 +62,7 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
+% \changes{v0.07}{2016/04/07}{Added citeneed macro, fixed TODO spacing.}
 % \changes{v0.06}{2016/04/04}{Fix for hyperref bug.}
 % \changes{v0.05}{2016/04/04}{BibTeX hack for missing babel languages.}
 % \changes{v0.04}{2015/12/30}{Added Color Universal Design color names, checks for incompatible packages.}
@@ -540,19 +541,42 @@
 %    \begin{macrocode}
 
 \ifthenelse{\boolean{@final}}{
-    \newcommand{\todo}[1]{
-        \PackageError{revquantum}{Unaddressed TODO}
-        \rq@todo{#1}
+    \newcommand{\todo}[1]{%
+        \PackageError{revquantum}{Unaddressed TODO}%
+        \rq@todo{#1}%
     }
 }{
-    \newcommand{\todo}[1]{
-        \PackageWarning{revquantum}{Unaddressed TODO}
-        \rq@todo{#1}
+    \newcommand{\todo}[1]{%
+        \PackageWarning{revquantum}{Unaddressed TODO}%
+        \rq@todo{#1}%
     }
 }
 
 %    \end{macrocode}
 % \end{macro}
+%
+% We also define a |\citeneed| command for the special case of a missing citation.
+% As per Steve Flammia's suggestion, this is formatted in analogy to the infamous
+% Wikipedia annotation.
+%
+% \begin{macro}{\citeneed}
+%     \begin{macrocode}
+\ifthenelse{\boolean{@final}}{
+    \newcommand{\citeneed}{%
+        \PackageError{revquantum}{citation needed}%
+        \rq@todo{[citation needed]}%
+    }
+}{
+    \newcommand{\citeneed}{%
+        \PackageWarning{revquantum}{citation needed}%
+        \rq@todo{[citation needed]}%
+    }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% Both of these macros are based on the |\rq@todo| macro, which performs the
+% formatting for TODOs.
 %
 % \begin{macro}{\rq@todo}
 %    \begin{macrocode}
@@ -562,6 +586,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% We also provide a few other special cases below.
 %
 % \begin{macro}{\TODO}
 %    \begin{macrocode}
@@ -762,24 +787,29 @@
 
 
 % \subsubsection{\textsf{autoref} Setup}
+% We must declare our \textsf{autoref} configuration at the beginning
+% of the document to keep other packages from clobbering it.
 
 % \begin{macro}{\sectionautorefname}
 %    \begin{macrocode}
-\def\sectionautorefname{Section}
+\AtBeginDocument{%
+    \def\sectionautorefname{Section}%
+}
 %    \end{macrocode}
 % \end{macro}
 %
 %
 % \begin{macro}{\algorithmautorefname}
 %    \begin{macrocode}
-\def\algorithmautorefname{Algorithm}
+\AtBeginDocument{%
+    \def\algorithmautorefname{Algorithm}%
+}
 %    \end{macrocode}
 % \end{macro}
 %
 %
 % \begin{macro}{\equationautorefname}
-% See http://tex.stackexchange.com/a/66150. We must declare this one at the beginning
-% of the document to keep other packages from clobbering it.
+% See http://tex.stackexchange.com/a/66150.
 %    \begin{macrocode}
 \AtBeginDocument{%
     \def\equationautorefname~#1\null{(#1)\null}%
@@ -790,7 +820,9 @@
 %
 % \begin{macro}{\lemmaautorefname}
 %    \begin{macrocode}
-\newcommand{\lemmaautorefname}{Lemma}
+\AtBeginDocument{%
+    \newcommand{\lemmaautorefname}{Lemma}%
+}
 %    \end{macrocode}
 % \end{macro}
 %
