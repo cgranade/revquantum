@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2016/04/04 v0.07 Hacks to make writing quantum papers for revtex4-1 less painful.]
+    [2016/04/11 v0.08 Hacks to make writing quantum papers for revtex4-1 less painful.]
 %</package>
 %
 %<*driver>
@@ -62,6 +62,7 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
+% \changes{v0.08}{2016/04/11}{Significant reworking to robustly configure colors and fonts in listings.}
 % \changes{v0.07}{2016/04/07}{Added citeneed macro, fixed TODO spacing.}
 % \changes{v0.06}{2016/04/04}{Fix for hyperref bug.}
 % \changes{v0.05}{2016/04/04}{BibTeX hack for missing babel languages.}
@@ -244,6 +245,11 @@
 % describes Section, Algorithm, and Lemma, and also follows the standard
 % notation for equation references.
 %
+% \DescribeMacro{\boolean{@xetex}}
+%
+% This boolean variable uses \textsf{iftex} to check if XeTeX is installed.
+% If \textsf{iftex} is not available, then we assume plain LaTeX.
+%
 % \subsection{New Colors}
 %
 % The \textsf{revquantum} package also provides a color palette
@@ -274,18 +280,131 @@
 % \fi
 %
 
-% \subsection{Options Handling} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% We will need to define a few options to make the package nicer to use. We do
-% so by making a new command, |\booloption| \marg{boolname} \marg{optionname}
-% \marg{default}.
 
 %    \begin{macrocode}
 
 \usepackage{ifthen}
 
 %    \end{macrocode}
+
+% \subsection{XeTeX Detection} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% We make a new boolean variable to track if XeTeX is being used.
+
+%    \begin{macrocode}
+
+\newboolean{@xetex}
+\setboolean{@xetex}{false}
+\IfFileExists{iftex.sty}{
+    \wlog{!!! iftex loaded !!!}
+    \usepackage{iftex}
+}{
+    \newif\ifXeTeX
+    \XeTeXfalse
+}
+\ifXeTeX
+    \wlog{!!! Using XeTeX !!!}
+    \setboolean{@xetex}{true}
+\else
+    \setboolean{@xetex}{false}
+\fi
+
+%    \end{macrocode}
+
+
+% \subsection{Notation} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+%
+% \begin{macro}{\newnew}
+%    \begin{macrocode}
+\newcommand{\newnew}[2]{
+    \expandafter\newcommand\csname new#1\endcsname[1]{
+      \expandafter\newcommand\csname ##1\endcsname{#2{##1}}
+    }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\newnew{operator}{\operatorname}
+\newnew{rm}{\mathrm}
+
+\newoperator{Tr}
+\newoperator{Cov}
+\newoperator{supp}
+\newoperator{diag}
+\newoperator{rank}
+
+%    \end{macrocode}
+%
+% \begin{macro}{\ii}
+%    \begin{macrocode}
+\newcommand{\ii}{\mathrm{i}} % Outside what newnew currently supports.
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\dd}
+%    \begin{macrocode}
+\newcommand{\dd}{\mathrm{d}} % Outside what newnew currently supports.
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+
+\newrm{e}
+\newrm{TVD}
+\newrm{T}
+
+%    \end{macrocode}
+%
+% \begin{macro}{\defeq}
+%    \begin{macrocode}
+\newcommand{\defeq}{\mathrel{:=}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\expect}
+%    \begin{macrocode}
+\newcommand{\expect}{\mathbb{E}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\id}
+%    \begin{macrocode}
+\newcommand{\id}{\openone}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+
+%    \end{macrocode}
+
+% We want to only conditionally use |{stmaryrd}| if it's available, and
+% otherwise, hack up a few commands from that package.
+%
+%    \begin{macrocode}
+    \IfFileExists{stmaryrd.sty}{
+        \RequirePackage{stmaryrd}
+    }{
+        \PackageWarning{revquantum}{
+            The stmaryrd package is not available,
+            so some commands (e.g.: double-brackets) will look wrong.
+        }
+        \newcommand{\llbracket}{[\!\!\hspace{1.5pt}[}
+        \newcommand{\rrbracket}{]\!\!\hspace{1.5pt}]}
+    }
+%    \end{macrocode}
+
+
+% \subsection{Options Handling} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% We will need to define a few options to make the package nicer to use. We do
+% so by making a new command, |\booloption| \marg{boolname} \marg{optionname}
+% \marg{default}.
 % \begin{macro}{\booloption}
 %    \begin{macrocode}
 \newcommand{\booloption}[3]{
@@ -367,9 +486,16 @@
 % \subsection{Imports} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Here, we import a few other useful packages and configure them according to
-% the options passed by the user. Note that we only load \textsf{color} if
-% \textsf{tikz} has not already been imported. Also of import is that we do
-% not import \textsf{hyperref} yet, as it must go last to avoid duplicating
+% the options passed by the user. In handling the fonts specified by
+% |[pretty]|, we must be careful to do so in a way that is supported by
+% XeTeX.
+% Note that we only load \textsf{color} if
+% neither \textsf{tikz} nor \textsf{xcolor} have already been imported, and if
+% we are not using \textsf{listings}. In the latter case, we will load
+% \textsf{xcolor} instead so that we can make \textsf{listings} play nicer with
+% our own custom palette.
+% Also of
+% note is that we do not import \textsf{hyperref} yet, as it must go last to avoid duplicating
 % reference names.
 
 %    \begin{macrocode}
@@ -380,7 +506,11 @@
 \RequirePackage{amssymb}
 \RequirePackage{amsbsy}
 \@ifpackageloaded{tikz}{}{%
-    \RequirePackage[usenames,dvipsnames]{color}%
+    \@ifpackageloaded{xcolor}{}{%
+        \ifthenelse{\boolean{@uselistings}}{}{%
+            \RequirePackage[usenames,dvipsnames]{color}%
+        }%
+    }%
     \AtBeginDocument{%
         \@ifpackageloaded{tikz}{%
             \rq@quasiwarn{tikz loaded, but after revquantum. This may not work.}%
@@ -391,9 +521,21 @@
 \RequirePackage{graphicx}
 \RequirePackage[english]{babel}
 \ifthenelse{\boolean{@pretty}}{
-    \RequirePackage{mathpazo}
+    \ifthenelse{\boolean{@xetex}}{
+        % http://tex.stackexchange.com/a/50593
+        \usepackage{fontspec}
+        \usepackage{mathpazo}
+        \setmainfont
+         [ BoldFont       = texgyrepagella-bold.otf ,
+           ItalicFont     = texgyrepagella-italic.otf ,
+           BoldItalicFont = texgyrepagella-bolditalic.otf ]
+         {texgyrepagella-regular.otf}
+    }{
+        \RequirePackage{mathpazo}
+    }
 }{}
 \ifthenelse{\boolean{@uselistings}}{
+    \RequirePackage{xcolor}
     \RequirePackage{listings}
     \RequirePackage{textcomp} % Make sure we have a ` for writing Mathematica.
 }{}
@@ -426,6 +568,10 @@
 
 % \subsubsection{\textsf{listings} Setup}
 
+% Here, we provide special support for scientific languages like Python and Mathematica,
+% as well as for legacy environments. This support consists of configuring escapes,
+% quoting, providing additional keywords, etc.
+
 %    \begin{macrocode}
 
 \ifthenelse{\boolean{@uselistings}}{
@@ -438,8 +584,16 @@
         gobble=4,
         numbers=left,
         numberstyle=\tiny, stepnumber=5,
-        numbersep=5pt
+        numbersep=5pt,
+        keywordstyle=\color{cud-bluish-green!85!black}\bfseries,
+        keywordstyle={[2]\color{cud-sky-blue!75!black}},
+        emphstyle=\color{cud-vermillion}
     }
+
+    \ifthenelse{\boolean{@xetex}}{
+        \RequirePackage{sourcecodepro}
+        \lstset{basicstyle=\footnotesize\sourcecodepro}
+    }{}
 
     \lstdefinestyle{matlab}{
         language=MATLAB,
@@ -450,6 +604,7 @@
         language=Python,
         mathescape=true,
         showstringspaces=false,
+        morekeywords={as,async,await}
     }
 
     \lstdefinestyle{mathematica}{
@@ -606,93 +761,6 @@
 %    \end{macrocode}
 % \end{macro}
 
-
-% \subsection{Notation} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%
-% \begin{macro}{\newnew}
-%    \begin{macrocode}
-\newcommand{\newnew}[2]{
-    \expandafter\newcommand\csname new#1\endcsname[1]{
-      \expandafter\newcommand\csname ##1\endcsname{#2{##1}}
-    }
-}
-%    \end{macrocode}
-% \end{macro}
-%
-%    \begin{macrocode}
-\newnew{operator}{\operatorname}
-\newnew{rm}{\mathrm}
-
-\newoperator{Tr}
-\newoperator{Cov}
-\newoperator{supp}
-\newoperator{diag}
-\newoperator{rank}
-
-%    \end{macrocode}
-%
-% \begin{macro}{\ii}
-%    \begin{macrocode}
-\newcommand{\ii}{\mathrm{i}} % Outside what newnew currently supports.
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\dd}
-%    \begin{macrocode}
-\newcommand{\dd}{\mathrm{d}} % Outside what newnew currently supports.
-%    \end{macrocode}
-% \end{macro}
-%
-%    \begin{macrocode}
-
-\newrm{e}
-\newrm{TVD}
-\newrm{T}
-
-%    \end{macrocode}
-%
-% \begin{macro}{\defeq}
-%    \begin{macrocode}
-\newcommand{\defeq}{\mathrel{:=}}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\expect}
-%    \begin{macrocode}
-\newcommand{\expect}{\mathbb{E}}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \begin{macro}{\id}
-%    \begin{macrocode}
-\newcommand{\id}{\openone}
-%    \end{macrocode}
-% \end{macro}
-%
-%    \begin{macrocode}
-
-%    \end{macrocode}
-
-% We want to only conditionally use |{stmaryrd}| if it's available, and
-% otherwise, hack up a few commands from that package.
-%
-%    \begin{macrocode}
-    \IfFileExists{stmaryrd.sty}{
-        \RequirePackage{stmaryrd}
-    }{
-        \PackageWarning{revquantum}{
-            The stmaryrd package is not available,
-            so some commands (e.g.: double-brackets) will look wrong.
-        }
-        \newcommand{\llbracket}{[\!\!\hspace{1.5pt}[}
-        \newcommand{\rrbracket}{]\!\!\hspace{1.5pt}]}
-    }
-%    \end{macrocode}
-
 % \subsection{Color Universal Design} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %    \begin{macrocode}
@@ -764,7 +832,6 @@
 }
 
 %    \end{macrocode}
-
 
 % \subsection{\textsf{hyperref} Setup} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
