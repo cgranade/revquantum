@@ -62,6 +62,7 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
+% \changes{v0.09}{2016/09/20}{wlog fix, updates to affil database.}
 % \changes{v0.08}{2016/04/11}{Significant reworking to robustly configure colors and fonts in listings.}
 % \changes{v0.07}{2016/04/07}{Added citeneed macro, fixed TODO spacing.}
 % \changes{v0.06}{2016/04/04}{Fix for hyperref bug.}
@@ -208,19 +209,26 @@
 % \DescribeMacro{\affilTODO} Special, marks that an affiliation is not
 % provided.
 %
-% \DescribeMacro{\affilEQUS} Centre for Engineered Quantum Systems.
+%
+% \DescribeMacro{\affilEQuSUSyd} Centre for Engineered Quantum Systems, University of Sydney.
+%
+% \DescribeMacro{\affilEQuSMacq} Centre for Engineered Quantum Systems, Macquarie University.
 %
 % \DescribeMacro{\affilUSydPhys} School of Physics, University of Sydney.
 %
-% \DescribeMacro{\affilIQC} Institute for Quantum Computing.
+% \DescribeMacro{\affilIQC} Institute for Quantum Computing, University of Waterloo.
 %
-% \DescribeMacro{\affilUWAMath} Dept. of Applied Mathematics, University of Waterloo.
+% \DescribeMacro{\affilUWPhys} Department of Physics, University of Waterloo.
 %
-% \DescribeMacro{\affilUWChem} Dept. of Chemistry, University of Waterloo.
+% \DescribeMacro{\affilUWAMath} Department of Applied Mathematics, University of Waterloo.
+%
+% \DescribeMacro{\affilUWChem} Department of Chemistry, University of Waterloo.
 %
 % \DescribeMacro{\affilPI} Perimeter Institute for Theoretical Physics.
 %
 % \DescribeMacro{\affilCIFAR} Canadian Institute for Advanced Research.
+%
+% \DescribeMacro{\affilCQuIC} Center for Quantum Information and Control, University of New Mexico.
 %
 % \DescribeMacro{\affilIBMTJW} IBM T. J. Watson Research Center.
 %
@@ -297,14 +305,14 @@
 \newboolean{@xetex}
 \setboolean{@xetex}{false}
 \IfFileExists{iftex.sty}{
-    \wlog{!!! iftex loaded !!!}
+    \wlog{[INFO] iftex loaded}
     \usepackage{iftex}
 }{
     \newif\ifXeTeX
     \XeTeXfalse
 }
 \ifXeTeX
-    \wlog{!!! Using XeTeX !!!}
+    \wlog{[INFO] Using XeTeX}
     \setboolean{@xetex}{true}
 \else
     \setboolean{@xetex}{false}
@@ -683,6 +691,8 @@
 %    \begin{macrocode}
 
 \definelanguagealias{en}{english}
+\definelanguagealias{EN}{english}
+\definelanguagealias{English}{english}
 
 %    \end{macrocode}
 
@@ -788,13 +798,26 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsubsection{General Affiliations}
+%
 %    \begin{macrocode}
 
 \newaffil{TODO}{\TODO}
 
-\newaffil{EQUS}{
+%    \end{macrocode}
+%
+% \subsubsection{Australia}
+%
+%    \begin{macrocode}
+
+\newaffil{EQuSUSyd}{
     Centre for Engineered Quantum Systems,
     University of Sydney,
+    Sydney, NSW, Australia
+}
+\newaffil{EQuSMacq}{
+    Centre for Engineered Quantum Systems,
+    Macquarie University,
     Sydney, NSW, Australia
 }
 \newaffil{USydPhys}{
@@ -802,8 +825,20 @@
     University of Sydney,
     Sydney, NSW, Australia
 }
+
+%    \end{macrocode}
+%
+% \subsubsection{Canada}
+%
+%    \begin{macrocode}
+
 \newaffil{IQC}{
     Institute for Quantum Computing,
+    University of Waterloo,
+    Waterloo, ON, Canada
+}
+\newaffil{UWPhys}{
+    Department of Physics,
     University of Waterloo,
     Waterloo, ON, Canada
 }
@@ -826,12 +861,26 @@
     Canadian Institute for Advanced Research,
     Toronto, ON, Canada
 }
+
+%    \end{macrocode}
+%
+% \subsubsection{United States}
+%
+%    \begin{macrocode}
+
+\newaffil{CQuIC}{
+    Center for Quantum Information and Control,
+    University of New Mexico,
+    Albuquerque, NM 87131-0001, USA
+}
 \newaffil{IBMTJW}{
     IBM T. J. Watson Research Center,
     Yorktown Heights, New York 10598, USA
 }
 
+
 %    \end{macrocode}
+
 
 % \subsection{\textsf{hyperref} Setup} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
