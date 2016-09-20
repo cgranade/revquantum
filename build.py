@@ -68,6 +68,7 @@ class LaTeXStyleBuilder(object):
     """
     style_name = None
     manifest = {}
+    ctan_manifest = {}
 
     def __init__(self, style_name):
         self.style_name = style_name
@@ -81,6 +82,14 @@ class LaTeXStyleBuilder(object):
                 'pdf': ['doc', 'latex']
             }.items()
         }
+
+        self.ctan_manifest = [
+            '{}.tds.zip'.format(style_name),
+            '{}.dtx'.format(style_name),
+            '{}.pdf'.format(style_name),
+            'build.py',
+            'README.md'
+        ]
 
     def build_sty(self):
         print("Building: {}.sty".format(self.style_name))
@@ -108,6 +117,18 @@ class LaTeXStyleBuilder(object):
         print("\n\n\n")
         return self
 
+    def build_ctan_zip(self):
+        print("Building: {}.zip".format(self.style_name))
+        ctan_zip = zipfile.ZipFile('{}.zip'.format(self.style_name), 'w')
+
+        for what in self.ctan_manifest:
+            assert os.path.isfile(what)
+            print("\tPacking: {}".format(what))
+            ctan_zip.write(what)
+
+        print("\n\n\n")
+        return self
+
     def install(self):
         for what, where in self.manifest.items():
             assert os.path.isfile(what)
@@ -128,8 +149,8 @@ WARNING: This installer is still in alpha, and is provided
 
     else:
         subcommand = sys.argv[1]
-        if subcommand not in ('tds', 'install'):
-            print("No such command {}, try either 'tds' or 'install'.")
+        if subcommand not in ('tds', 'install', 'ctan'):
+            print("No such command {}, try either 'tds', 'install' or 'ctan'.")
             print_usage()
 
         builder = LaTeXStyleBuilder(PACKAGE_NAME)
@@ -140,6 +161,9 @@ WARNING: This installer is still in alpha, and is provided
 
         elif subcommand == 'install':
             builder.install()
+
+        elif subcommand == 'ctan':
+            builder.build_tds_zip().build_ctan_zip()
 
         else:
             assert False
