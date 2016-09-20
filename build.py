@@ -3,9 +3,12 @@
 from __future__ import print_function
 
 PACKAGE_NAME = 'revquantum'
+TEX_DIR = None
 
+import errno
 import sys
 import os
+import tempfile
 import shutil
 import zipfile
 from subprocess import Popen, PIPE
@@ -24,7 +27,59 @@ python build.py install
 """)
     sys.exit(1)
 
-def find_tex():
+def is_writable(dir_name):
+    # Technique adapted from:
+    #     http://stackoverflow.com/a/25868839/267841
+    # We modify by not raising on other OSErrors, as
+    # we don't care *why* a directory isn't writable,
+    # so much as that we need to know that it isn't.
+    # We also note that tempfile raises an IOError
+    # on Windows if it can't write, so we catch that,
+    # too.
+    try:
+        with tempfile.TemporaryFile(dir=dir_name):
+            pass
+    except (OSError, IOError) as ex:
+        return False
+    
+    return True
+
+def mkdir_p(path):
+    # Copied from http://stackoverflow.com/a/600612/267841,
+    # in keeping with the CC-BY-SA 3.0 license on StackOverflow
+    # user contributions.
+    if os.path.isdir(path):
+        return
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python > 2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+    except WindowsError as exc:
+        if exc.errno == 183 and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+def try_until(condition, *fns):
+    for fn in fns:
+        retval = fn()
+        if condition(retval):
+            return retval
+
+    # This is likely a terrible error for any poor user,
+    # so we should probably catch it. Probably.
+    raise RuntimeError("No candidates found matching the given condition.")
+
+def is_miktek():
+    # Assume MikTeX if and only if Windows.
+    # This is a bad assumption, but we can encapsulate
+    # it here and generalize later.
+    return os.name == 'nt'
+
+def find_tex_root():
     proc = Popen(['kpsewhich', 'article.cls'], stdout=PIPE)
     stdout, stderr = proc.communicate()
 
@@ -46,12 +101,48 @@ def find_tex():
 
     return tex_root
 
+def find_tex_user():
+    if is_miktek():
+        # Use MikTeX's initexmf utility to find the user install
+        # dir.
+        #     http://tex.stackexchange.com/a/69484/615
+        initexmf = Popen(['initexmf', '--report'], stdout=PIPE)
+        stdout, stderr = initexmf.communicate()
+
+        for line in stdout.split('\n'):
+            try:
+                key, value = line.split(':', 1)
+                if key.strip().lower() == 'userinstall':
+                    return value.strip()
+            except:
+                continue
+
+        raise RuntimeError("MikTeX did not report a UserInstall directory.")
+
+    else:
+        return os.path.expanduser('~/texmf')
+
+def find_tex():
+    global TEX_DIR
+
+    if TEX_DIR is None:
+        TEX_DIR = try_until(is_writable, 
+            find_tex_root,
+            find_tex_user
+        )
+
+    return TEX_DIR
+
 def copy_to_tex(what, tex_path=['tex', 'latex']):
     tex_root = find_tex()
     where = os.path.join(tex_root, *tex_path)
+    full_path = os.path.join(where, what)
 
-    print("Installing: {} ---> {}".format(what, where))
-    shutil.copyfile(what, where)
+    # Check if the directory exists, make it if it doesn't.
+    mkdir_p(where)
+
+    print("Installing: {} ---> {}".format(what, full_path))
+    shutil.copyfile(what, full_path)
 
 def yes_proc(args, yes="yes"):
     proc = Popen(args, stdin=PIPE)
@@ -133,6 +224,12 @@ class LaTeXStyleBuilder(object):
         for what, where in self.manifest.items():
             assert os.path.isfile(what)
             copy_to_tex(what, where)
+
+        # Make sure to run texhash if we're not using MikTeX.
+        if not is_miktek():
+            print("Rehashing...")
+            texhash = Popen(['texhash'])
+            texhash.wait()
 
         return self
 
