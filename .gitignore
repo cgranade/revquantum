@@ -9,3 +9,11 @@
 *.blg
 *.synctex.gz
 *Notes.bib
+*.sublime-project
+*.sublime-workspace
+*.zip
+*.pyc
+*.fls
+*.fdb_latexmk
+pandoc/*.tex
+*.zip

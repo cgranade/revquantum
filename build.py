@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 PACKAGE_NAME = 'revquantum'
 TEX_DIR = None
@@ -12,6 +12,8 @@ import tempfile
 import shutil
 import zipfile
 from subprocess import Popen, PIPE
+
+from io import StringIO
 
 def print_usage():
     print("""
@@ -144,6 +146,35 @@ def copy_to_tex(what, tex_path=['tex', 'latex']):
     print("Installing: {} ---> {}".format(what, full_path))
     shutil.copyfile(what, full_path)
 
+def write_to_zip(zip_file, filename, arcname=None, normalize_crlf=None):
+    """
+    normalize_crlf = None: automatically detect from filename.
+    """
+
+    if normalize_crlf is None:
+        root, ext = os.path.splitext(filename)
+        if ext in ('.dtx', '.ins', '.txt', '.md', '.py', '.tex'):
+            normalize_crlf = True
+        else:
+            normalize_crlf = False
+
+    if arcname is None:
+        arcname = filename
+
+    if not normalize_crlf:
+        print("\tPacking: {} ---> {}".format(filename, arcname))
+        zip_file.write(filename, arcname=arcname)
+    else:
+        print("\tPacking: {} ---> {} (normalized line endings)".format(filename, arcname))
+        contents = StringIO(newline='\n')
+        with open(filename, 'r') as f:
+            for line in f:
+                contents.write(line.decode('utf-8'))
+        zip_file.writestr(
+            arcname,
+            contents.getvalue()
+        )
+
 def yes_proc(args, yes="yes"):
     proc = Popen(args, stdin=PIPE)
     while proc.returncode is None:
@@ -175,8 +206,8 @@ class LaTeXStyleBuilder(object):
         }
 
         self.ctan_manifest = [
-            '{}.tds.zip'.format(style_name),
             '{}.dtx'.format(style_name),
+            '{}.ins'.format(style_name),
             '{}.pdf'.format(style_name),
             'build.py',
             'README.md'
@@ -202,8 +233,7 @@ class LaTeXStyleBuilder(object):
 
         for what, where in self.manifest.items():
             assert os.path.isfile(what)
-            print("\tPacking: {} ---> {}".format(what, os.path.join(*where)))
-            tds_zip.write(what, arcname=os.path.join(*where + [what]))
+            write_to_zip(tds_zip, what, arcname=os.path.join(*where + [what]))
 
         print("\n\n\n")
         return self
@@ -214,8 +244,7 @@ class LaTeXStyleBuilder(object):
 
         for what in self.ctan_manifest:
             assert os.path.isfile(what)
-            print("\tPacking: {}".format(what))
-            ctan_zip.write(what)
+            write_to_zip(ctan_zip, what, arcname=os.path.join(self.style_name, what))
 
         print("\n\n\n")
         return self
@@ -260,7 +289,7 @@ WARNING: This installer is still in alpha, and is provided
             builder.install()
 
         elif subcommand == 'ctan':
-            builder.build_tds_zip().build_ctan_zip()
+            builder.build_ctan_zip()
 
         else:
             assert False

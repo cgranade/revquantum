@@ -6,7 +6,7 @@ writing quantum information papers in ``{revtex4-1}``. In particular:
 - Includes titles in BibTeX.
 - Allows for use of nicer-looking fonts via ``{mathpazo}``.
 - Configures ``{hyperref}`` to make nicer-looking links and to correctly use ``\autoref``.
-- Sets up ``{listings}`` for common scientific langauges and legacy environments (Python, Mathematica and MATLAB).
+- Sets up ``{listings}`` for common scientific languages and legacy environments (Python, Mathematica and MATLAB).
 - Provides notation for quantum information and makes defining new notation easier.
 - Reduces boilerplate for author affiliations by providing a (rudimentary) database for a few departments.
 
