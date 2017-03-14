@@ -550,6 +550,7 @@
 }{}
 \ifthenelse{\boolean{@bibtexhacks}}{
     \RequirePackage{letltxmacro}
+    \RequirePackage{etoolbox}
 }{}
 %    \end{macrocode}
 
@@ -664,17 +665,21 @@
 % suggested by egreg} for a rather annoying |{revtex4-1}| bug. In particular,
 % we will set up |language={en}| as an alias for |language={english}|, so that
 % |{revtex4-1}| will no longer raise |{babel}| errors for the undefined language.
+% As with our unforgivable hacks, we will guard the forgivable hacks with
+% the |[nobibtexhacks]| option.
 
 % \begin{macro}{\ORIGselectlanguage}
 %    \begin{macrocode}
 
-\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
-\DeclareRobustCommand{\selectlanguage}[1]{%
-  \@ifundefined{alias@\string#1}
-    {\ORIGselectlanguage{#1}}
-    {\begingroup\edef\x{\endgroup
-       \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
-}
+\ifthenelse{\boolean{@bibtexhacks}}{
+    \LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+    \DeclareRobustCommand{\selectlanguage}[1]{%
+      \@ifundefined{alias@\string#1}
+        {\ORIGselectlanguage{#1}}
+        {\begingroup\edef\x{\endgroup
+           \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+    }
+}{}
 
 %    \end{macrocode}
 % \end{macro}
@@ -696,6 +701,23 @@
 \definelanguagealias{English}{english}
 
 %    \end{macrocode}
+
+% We will also redefine |\doibase| to eat any newlines following it, and to
+% prefer HTTPS to HTTP. This will fix a rather annoying bug where line breaks
+% in the *.bbl source can introduce extraneous spaces into the target of
+% each citation's |\href|.
+
+% \begin{macro}{\doibase}
+%     \begin{macrocode}
+
+\ifthenelse{\boolean{@bibtexhacks}}{
+    % Ensure that the \doibase command is defined, just in case.
+    \providecommand{\doibase}{}
+    \renewcommand{\doibase}[1]{https://dx.doi.org/\ifdefempty{#1}{}{#1}} 
+}{}
+
+%     \end{macrocode}
+% \end{macro}
 
 
 % \subsection{TODO Support} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
