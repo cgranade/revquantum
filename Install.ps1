@@ -1,9 +1,9 @@
-# bootstrap posh-tex
+#region Bootstrap PoShTeX
 if (!(Get-Module -ListAvailable -Name posh-tex -ErrorAction SilentlyContinue)) {
-    Install-Module posh-tex
+    Install-Module posh-tex -Scope CurrentUser
 }
 Import-Module posh-tex
-# /bootstrap posh-tex
+#endregion
 
 Out-TeXStyle revquantum
 Out-TeXStyleDocumentation revquantum
