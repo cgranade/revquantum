@@ -40,7 +40,20 @@ A major goal of this package is to reduce the amount of useless crap that needs 
 
 ## Installing ##
 
-Installing LaTeX packages outside of CTAN is a pain, and this is no exception. I'll submit there at some point to remove that difficulty. In the meantime, I think the following works on Unix-like systems. If not, let me know or pull request with better instructions.
+### Install With PowerShell ###
+
+In an attempt to cut down on the pain of LaTeX package installation, ``{revquantum}`` uses [PoShTeX](https://github.com/cgranade/posh-tex/) to automate installation. If you're running PowerShell already, just run ``Install.ps1``:
+
+```powershell
+PS> Unblock-File Install.ps1 # Mark the installer as safe to run.
+PS> ./Install.ps1
+```
+
+PowerShell itself is easy to install on many macOS and Linux systems using the [provided packages](https://github.com/PowerShell/PowerShell#get-powershell).
+
+### Manual Installation ###
+
+I think the following works on Unix-like systems. If not, let me know or pull request with better instructions.
 
 ```bash
 $ latex revquantum.ins # Makes the actual .sty from the .dtx file.
