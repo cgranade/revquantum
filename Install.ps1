@@ -18,5 +18,5 @@ Install-PandocUserResource templates pandoc/templates/revquantum.latex -ErrorAct
 
 if ($CTAN) {
     Invoke-TeXBuildEngine example.tex
-    Export-CTANArchive -ArchiveLayout Simple revquantum.ins, README.md, example.tex, example.pdf, Install.ps1
+    Export-CTANArchive -ArchiveLayout Simple revquantum.ins, revquantum.pdf, README.md, example.tex, example.pdf, Install.ps1
 }
