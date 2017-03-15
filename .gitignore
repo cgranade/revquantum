@@ -17,3 +17,5 @@
 *.fdb_latexmk
 pandoc/*.tex
 *.zip
+*.ilg
+*.ind
