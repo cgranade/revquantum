@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2017/03/15 v0.11 Misc. fixes and improved installer.]
+    [2018/08/27 v0.12 Affiliation database improvements.]
 %</package>
 %
 %<*driver>
@@ -221,6 +221,8 @@
 %
 % \DescribeMacro{\affilUWPhys} Department of Physics, University of Waterloo.
 %
+% \DescribeMacro{\affilUWPhysAstro} Department of Physics and Astronomy, University of Waterloo.
+%
 % \DescribeMacro{\affilUWAMath} Department of Applied Mathematics, University of Waterloo.
 %
 % \DescribeMacro{\affilUWChem} Department of Chemistry, University of Waterloo.
@@ -232,6 +234,8 @@
 % \DescribeMacro{\affilCQuIC} Center for Quantum Information and Control, University of New Mexico.
 %
 % \DescribeMacro{\affilIBMTJW} IBM T. J. Watson Research Center.
+%
+% \DescribeMacro{\affilMSRQuArC} Microsoft Quantum Architectures and Computation Group.
 %
 %
 % \subsubsection{Internal-Use Commands}
@@ -865,6 +869,12 @@
     University of Waterloo,
     Waterloo, ON, Canada
 }
+
+\newaffil{UWPhysAstro}{
+    Department of Physics and Astronomy,
+    University of Waterloo,
+    Waterloo, ON, Canada
+}
 \newaffil{UWAMath}{
     Department of Applied Mathematics,
     University of Waterloo,
@@ -900,7 +910,10 @@
     IBM T. J. Watson Research Center,
     Yorktown Heights, New York 10598, USA
 }
-
+\newaffil{MSRQuArC}{
+    Microsoft Research, Quantum Architectures and Computation Group,
+    Redmond, Washington 98052, USA
+}
 
 %    \end{macrocode}
 
