@@ -26,7 +26,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{revquantum}
 %<*package>
-    [2018/08/27 v0.12 Affiliation database improvements.]
+    [2020/03/05 v0.13 Take hard dependency on iftex.]
 %</package>
 %
 %<*driver>
@@ -62,6 +62,7 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
+% \changes{v0.12}{2018/08/27}{Affiliation database improvements.}
 % \changes{v0.10}{2016/09/21}{Build script fixes for CTAN submission.}
 % \changes{v0.09}{2016/09/20}{wlog fix, updates to affil database.}
 % \changes{v0.08}{2016/04/11}{Significant reworking to robustly configure colors and fonts in listings.}
@@ -309,13 +310,7 @@
 
 \newboolean{@xetex}
 \setboolean{@xetex}{false}
-\IfFileExists{iftex.sty}{
-    \wlog{[INFO] iftex loaded}
-    \usepackage{iftex}
-}{
-    \newif\ifXeTeX
-    \XeTeXfalse
-}
+\RequirePackage{iftex}
 \ifXeTeX
     \wlog{[INFO] Using XeTeX}
     \setboolean{@xetex}{true}
